@@ -58,26 +58,46 @@
               const sidebar = new Sidebar({
                 direction: Sidebar.direction.TOP
               });
+
               const uploader = new ImageUploader({
                 containerEl: uploaderContainerEl,
                 async onFilesSelected(files) {
                   uploader.setUploadStatus({ isUploading: true });
-                  const filesToUpload = Array.from(files);
+                  let filesToUpload = Array.from(files);
                   let filesUploaded = 0;
+                  const filesToUploadCount = filesToUpload.length;
 
-                  const imageUrls = await Promise.all(filesToUpload.map(async (file) => {
-                    const url = await getUploadSignedRequest(file);
-                    filesUploaded += 1;
-                    uploader.setUploadStatus({ text: `Uploaded ${filesUploaded} from ${filesToUpload.length} images` });
+                  const doUploadImages = async () => {
+                    const imageUrls = await Promise.all(filesToUpload.map(async (file) => {
+                      const url = await getUploadSignedRequest(file);
+                      filesUploaded += 1;
+                      filesToUpload.splice(filesToUpload.indexOf(file), 1);
+                      uploader.setUploadStatus({ text: `Uploaded ${filesUploaded} from ${filesToUploadCount} images` });
 
-                    return url;
-                  }));
+                      return url;
+                    }));
 
-                  renderImages(imageUrls);
-                  lightGallery(imagesContainer);
+                    return imageUrls;
+                  };
 
-                  uploader.setUploadStatus({ isUploading: false });
-                  sidebar.hide();
+                  const handleUpload = async () => {
+                    const handleGoesBackToOnline = async (event) => {
+                      await handleUpload();
+                    }
+
+                    window.addEventListener('online', handleGoesBackToOnline, { once: true });
+
+                    const imageUrls = await doUploadImages();
+                    renderImages(imageUrls);
+                    lightGallery(imagesContainer);
+
+                    window.removeEventListener('online', handleGoesBackToOnline);
+
+                    uploader.setUploadStatus({ isUploading: false });
+                    sidebar.hide();
+                  };
+
+                  await handleUpload();
                 }
               });
 

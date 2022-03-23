@@ -1,24 +1,3 @@
-// document.addEventListener('paste', (e) => {
-//   const file = e.clipboardData.items[0].getAsFile();
-//   if (!file.type.startsWith('image')) return;
-
-//   const imgEl = new Image();
-//   const reader = new FileReader();
-
-//   imgEl.style.maxWidth = '100%';
-
-//   reader.onload = (e) => {
-//     imgEl.src = e.target.result;
-//     document.body.appendChild(imgEl);
-//     if ('scrollIntoView' in imgEl) {
-//       imgEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
-//     } else {
-//       window.scrollTo(0, document.documentElement.scrollHeight - imgEl.height);
-//     }
-//   };
-//   reader.readAsDataURL(file);
-// });
-
 const ImageUploader = (() => {
   const ImageFileMimeTypes = {
     JPEG: 'image/jpeg',
@@ -77,7 +56,10 @@ const ImageUploader = (() => {
 
     bindEvents() {
       this.containerEl.addEventListener('click', (e) => {
-        if (!e.target.closest('.js-image-uploader__file-input')) {
+        if (
+          !e.target.closest('.js-image-uploader__file-input') &&
+          !this.state.isUploading
+        ) {
           this.containerEl
             .querySelector('.js-image-uploader__file-input')
             .click();
@@ -126,7 +108,10 @@ const ImageUploader = (() => {
       };
     }
     setUploadStatus({ isUploading, text }) {
-      if (isUploading && this.state.isUploading !== isUploading) {
+      if (
+        typeof isUploading !== 'undefined' &&
+        this.state.isUploading !== isUploading
+      ) {
         this.toggleUploadingOverlay();
       }
 
@@ -134,7 +119,9 @@ const ImageUploader = (() => {
         this.updateUploadOverlayText(text);
       }
 
-      this.state.isUploading = isUploading;
+      if (typeof isUploading !== 'undefined') {
+        this.state.isUploading = isUploading;
+      }
     }
 
     toggleUploadingOverlay() {
