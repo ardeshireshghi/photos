@@ -104,7 +104,7 @@ class S3BlobStoreClient implements BlobStoreClient {
     const s3Params = {
       Bucket: this.bucketName,
       Key: key,
-      Expires: 60,
+      Expires: 180,
       ContentType: fileType,
       ACL: 'public-read'
     };
