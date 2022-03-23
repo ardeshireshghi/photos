@@ -45,6 +45,9 @@ const ImageUploader = (() => {
         isRendered: false,
         isUploading: false
       };
+
+      this._handleDragOverEnter = this._handleDragOverEnter.bind(this);
+      this._handleDragLeaveEnd = this._handleDragLeaveEnd.bind(this);
     }
 
     render() {
@@ -58,7 +61,7 @@ const ImageUploader = (() => {
       document.head.appendChild(style);
 
       this.containerEl.innerHTML = `
-        <div class="image-uploader">
+        <div class="js-image-uploader image-uploader">
           <div class="js-image-uploader__overlay image-uploader__overlay image-uploader--hidden">Uploading images...</div>
           <div class="image-uploader__inner">
             <input accept="${acceptedFiles}" tabindex="-1" multiple="" type="file" class="js-image-uploader__file-input image-uploader__file-input" />
@@ -80,6 +83,41 @@ const ImageUploader = (() => {
             .click();
         }
       });
+
+      this.containerEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+      this.containerEl.addEventListener('drop', (ev) => {
+        ev.preventDefault();
+        let files = [];
+
+        if (ev.dataTransfer.items) {
+          // Use DataTransferItemList interface to access the file(s)
+          for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+            // If dropped items aren't files, reject them
+            if (ev.dataTransfer.items[i].kind === 'file') {
+              files.push(ev.dataTransfer.items[i].getAsFile());
+            }
+          }
+        } else {
+          // Use DataTransfer interface to access the file(s)
+          if (ev.dataTransfer.files.length > 0) {
+            ev.dataTransfer.files;
+          }
+          for (let i = 0; i < ev.dataTransfer.files.length; i++) {
+            files = [...files, ...ev.dataTransfer.files];
+          }
+        }
+
+        files.length > 0 && this.onFilesSelected(files);
+      });
+
+      this.containerEl.addEventListener('dragover', this._handleDragOverEnter);
+      this.containerEl.addEventListener('dragenter', this._handleDragOverEnter);
+      this.containerEl.addEventListener('dragleave', this._handleDragLeaveEnd);
+      this.containerEl.addEventListener('dragend', this._handleDragLeaveEnd);
 
       this.containerEl.querySelector('[type="file"]').onchange = (e) => {
         const files = e.target.files;
@@ -114,6 +152,20 @@ const ImageUploader = (() => {
       overlay.textContent = text;
     }
 
+    _handleDragOverEnter(e) {
+      e.preventDefault();
+      this.containerEl
+        .querySelector('.js-image-uploader')
+        .classList.add('image-uploader--dragover');
+    }
+
+    _handleDragLeaveEnd(e) {
+      e.preventDefault();
+      this.containerEl
+        .querySelector('.js-image-uploader')
+        .classList.remove('image-uploader--dragover');
+    }
+
     get styles() {
       return `
         .image-uploader {
@@ -122,14 +174,21 @@ const ImageUploader = (() => {
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          border: 2px dashed #aaa;
-          border-radius: 10px;
-          background-color: #f4f4f4;
+          outline: 2px dashed #92b0b3;
+          outline-offset: -10px;
+          background-color: #e9eeef;
+          transition: outline-offset .15s ease-in-out, background-color .15s linear;
           cursor: pointer;
         }
 
+        .image-uploader--dragover {
+          outline-offset: -15px;
+          outline-color: #c8dadf;
+          background-color: #fff;
+        }
+
         .image-uploader__inner {
-          padding: 40px;
+          padding: 80px;
         }
 
         .image-uploader__file-input {
