@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Image Gallery and uploader</title>
+    <link href="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/src/css/lightgallery.css" rel="stylesheet" type="text/css" />
+    <link href="/styles/app.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <button class="btn-upload js-btn-upload">+</button>
+    <div class="wrapper">
+      <header>
+        <h1>Image Gallery and uploader</h1>
+      </header>
+        <div id="uploader" class="uploader"></div>
+        <div class="js-images images"></div>
+
+        <script src="js/services/upload-photo.js"></script>
+        <script src="js/services/image-fetcher.js"></script>
+        <script src="js/modules/image-uploader.js"></script>
+        <script src="https://unpkg.com/@eardi/vanilla-js-sidebar@0.5.3/src/sidebar.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lightgallery.min.js"></script>
+
+        <script>
+          (() => {
+            function renderImages(imageUrls) {
+              const imagesContainer = document.querySelector('.js-images');
+              imageUrls.forEach(url => {
+                const imageLink = document.createElement('a');
+                imageLink.href= url;
+                imageLink.className = 'image';
+
+                if (imagesContainer.children.length > 0) {
+                  imagesContainer.insertBefore(imageLink, imagesContainer.firstChild);
+                } else {
+                  imagesContainer.appendChild(imageLink)
+                }
+
+                imageLink.style.backgroundImage = `url(${url})`;
+              });
+            }
+
+            async function init() {
+              const uploaderContainerEl = document.getElementById('uploader');
+              const imagesContainer = document.querySelector('.js-images');
+
+              const sidebar = new Sidebar({
+                direction: Sidebar.direction.TOP
+              });
+              const uploader = new ImageUploader({
+                containerEl: uploaderContainerEl,
+                async onFilesSelected(files) {
+                  uploader.setUploadStatus({ isUploading: true });
+                  const filesToUpload = Array.from(files);
+                  let filesUploaded = 0;
+
+                  const imageUrls = await Promise.all(filesToUpload.map(async (file) => {
+                    const url = await getUploadSignedRequest(file);
+                    filesUploaded += 1;
+                    uploader.setUploadStatus({ text: `Uploaded ${filesUploaded} from ${filesToUpload.length} images` });
+
+                    return url;
+                  }));
+
+                  renderImages(imageUrls);
+                  uploader.setUploadStatus({ isUploading: false });
+                  sidebar.hide();
+                }
+              });
+
+              sidebar.renderContent(uploaderContainerEl);
+              uploader.render();
+
+              // Show uploader when button is clicked
+              document.querySelector('.js-btn-upload').onclick = () => sidebar.show();
+
+              renderImages(await fetchImages());
+              lightGallery(imagesContainer);
+            }
+
+            document.addEventListener('DOMContentLoaded', async () => {
+              await init();
+            });
+          })();
+        </script>
+  </body>
+</html>
