@@ -28,6 +28,7 @@
 
         <script src="js/services/upload-photo.js"></script>
         <script src="js/services/image-fetcher.js"></script>
+        <script src="js/modules/concurrent-task-runner.js"></script>
         <script src="js/modules/image-uploader.js"></script>
         <script src="https://unpkg.com/@eardi/vanilla-js-sidebar@0.5.3/src/sidebar.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lightgallery.min.js"></script>
@@ -48,6 +49,8 @@
                 }
 
                 imageLink.style.backgroundImage = `url(${url})`;
+                imageLink.style.backgroundPosition = 'center';
+                imageLink.style.backgroundSize = 'cover';
               });
             }
 
@@ -59,6 +62,10 @@
                 direction: Sidebar.direction.TOP
               });
 
+              const uploadTaskRunner = new ConcurrentTaskRunner({
+                concurrency: 10
+              });
+
               const uploader = new ImageUploader({
                 containerEl: uploaderContainerEl,
                 async onFilesSelected(files) {
@@ -67,28 +74,31 @@
                   let filesUploaded = 0;
                   const filesToUploadCount = filesToUpload.length;
 
-                  const doUploadImages = async () => {
-                    const imageUrls = await Promise.all(filesToUpload.map(async (file) => {
-                      const url = await getUploadSignedRequest(file);
-                      filesUploaded += 1;
-                      filesToUpload.splice(filesToUpload.indexOf(file), 1);
-                      uploader.setUploadStatus({ text: `Uploaded ${filesUploaded} from ${filesToUploadCount} images` });
+                  const doUploadImages = () => {
+                    return new Promise((resolve, reject) => {
+                      uploadTaskRunner.onComplete = async (tasks) => {
+                        resolve();
+                      };
 
-                      return url;
-                    }));
+                      uploadTaskRunner.enqueue(filesToUpload.map(async (file) => {
+                        const url = await getUploadSignedRequest(file);
+                        renderImages([url]);
 
-                    return imageUrls;
+                        filesUploaded += 1;
+                        filesToUpload.splice(filesToUpload.indexOf(file), 1);
+                        uploader.setUploadStatus({ text: `Uploaded ${filesUploaded} from ${filesToUploadCount} images` });
+                      }));
+                    });
                   };
 
                   const handleUpload = async () => {
                     const handleGoesBackToOnline = async (event) => {
                       await handleUpload();
-                    }
+                    };
 
                     window.addEventListener('online', handleGoesBackToOnline, { once: true });
 
-                    const imageUrls = await doUploadImages();
-                    renderImages(imageUrls);
+                    await doUploadImages();
                     lightGallery(imagesContainer);
 
                     window.removeEventListener('online', handleGoesBackToOnline);

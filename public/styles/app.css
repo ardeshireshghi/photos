@@ -177,8 +177,6 @@ input[type='checkbox']:checked ~ aside {
 .image {
   display: block;
   position: relative;
-  background-position: center;
-  background-size: cover;
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: calc(50% - 0.5rem);
@@ -186,6 +184,13 @@ input[type='checkbox']:checked ~ aside {
   height: 0px;
   transition: all 0.25s;
   box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  background-image: radial-gradient(circle 20px, white 99%, transparent 0),
+    radial-gradient(circle 20px, white 99%, transparent 0),
+    radial-gradient(circle 20px, white 99%, transparent 0),
+    linear-gradient(#d2dada 100%, transparent 0);
+  background-size: 100px 100px, 100px 100px, 100px 100px, 100% 100%;
+  background-position: 20% 50%, 50% 50%, 80% 50%, 0 0;
+  background-repeat: no-repeat;
 }
 
 .image:hover {
