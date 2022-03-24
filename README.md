@@ -1,10 +1,6 @@
 # photos
 
-![Gif Demo](assets/audio-stream-screengrab.gif)
-
 This is a simple Photo Gallery app which runs on Heroku and stores photos on S3.
-
-![Heroku](https://heroku-badge.herokuapp.com/?app=sacred-photoshoots)
 
 ## Installation
 
