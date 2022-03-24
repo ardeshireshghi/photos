@@ -2,17 +2,25 @@
 
 ![Gif Demo](assets/audio-stream-screengrab.gif)
 
-PThis is an S3 based photo Gallery app
+This is a simple Photo Gallery app which runs on Heroku and stores photos on S3.
 
 ![Heroku](https://heroku-badge.herokuapp.com/?app=sacred-photoshoots)
 
 ## Installation
 
-You need node > 12 and `yarn` to run the app.
+You need node >= 12 and `yarn` to run the app.
 
 Run `yarn install`.
 
 ## Running the app
+
+Before running the app you need to setup a S3 bucket. Install `aws-cli` and configure the profile.
+
+To setup a new Blob storage (assumes you have AWS account and IAM access to create a new S3 bucket), please do
+
+```sh
+$ ./scripts/setup-s3-store.sh <name-of-your-bucket> <optional-aws-region>
+```
 
 ### Locally
 
@@ -26,11 +34,17 @@ Go to http://localhost:9999
 
 ## Deployment
 
-Currently the app is deployed on Heroku. There is no CI/CD setup at the moment so the deployment happens from a local machine. The current live URL is:
+Currently, the deployment assumes below:
 
-https://sacred-photoshoots.herokuapp.com/
+1. You are deploying to Heroku. You need to set a Heroku account, create a new app and get an Heroku API key.
+2. Using Github and need to set the below secrets for Github actions. There is already a "deploy app" action workflow:
+
+- HEROKU_API_KEY
+- HEROKU_APP_NAME
+- AWS_ACCESS_KEY_ID (access S3 bucket)
+- AWS_SECRET_ACCESS_KEY (access S3 bucket)
 
 ## Infrastructure
 
-1. **Heroku**: Hosts the web app and at the moment the deployment is not automated
+1. **Heroku**: Hosts the web app
 2. **AWS**: Hosts the photo Blob (S3 bucket)
