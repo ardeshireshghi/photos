@@ -8,7 +8,7 @@ export enum BlobStoreTypes {
 
 function createS3Client() {
   return new S3({
-    region: process.env.AWS_DEFAULT_REGION || 'eu-west-2'
+    region: process.env.AWS_REGION || 'eu-west-2'
   });
 }
 

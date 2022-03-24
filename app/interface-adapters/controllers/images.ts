@@ -3,11 +3,27 @@ import createBlobStoreClient, {
   File
 } from '../../infrastructure/blob-store/src/BlobStoreClient';
 
+export class NoS3Bucket extends Error {
+  constructor() {
+    super('S3 bucket does not exists');
+  }
+}
+
 export default function createImageController(
   blobStoreClient: BlobStoreClient
 ) {
   const fetchImages = async (req, res, next) => {
-    const imageFiles = (await blobStoreClient.getFiles()) as File[];
+    let imageFiles: File[] = [];
+
+    try {
+      imageFiles = (await blobStoreClient.getFiles()) as File[];
+    } catch (err) {
+      if (err.name === 'NoSuchBucket') {
+        next(new NoS3Bucket());
+        return;
+      }
+    }
+
     let imageUrls = [];
     if (imageFiles.length > 0) {
       imageUrls = imageFiles

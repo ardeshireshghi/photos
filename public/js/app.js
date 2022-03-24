@@ -135,10 +135,20 @@
     sidebar.renderContent(uploaderContainerEl);
     uploader.render();
 
-    const urls = await fetchImages();
+    try {
+      const urls = await fetchImages();
+      if (urls.length > 0) {
+        renderImages(urls);
+      }
+    } catch (err) {
+      const noImageText = imagesContainer.querySelector(
+        '.js-images__no-image-text'
+      );
+      noImageText.style.color = 'red';
+      noImageText.textContent =
+        '😬 There was an error loading the images. Please try again later';
 
-    if (urls.length > 0) {
-      renderImages(urls);
+      throw err;
     }
 
     // Show uploader when button is clicked
@@ -146,10 +156,12 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    await init();
-
-    setTimeout(() => {
-      document.querySelector('.js-loader').classList.add('loader--is-hidden');
-    }, 400);
+    try {
+      await init();
+    } finally {
+      setTimeout(() => {
+        document.querySelector('.js-loader').classList.add('loader--is-hidden');
+      }, 400);
+    }
   });
 })();
