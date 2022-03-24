@@ -42,7 +42,7 @@
 
               setTimeout(() => {
                 imageEl.classList.add('image--loaded');
-              }, 100);
+              }, 300);
             }
           }
         });
