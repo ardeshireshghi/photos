@@ -170,8 +170,16 @@ input[type='checkbox']:checked ~ aside {
 .images {
   margin-top: 1rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.125rem;
   flex-wrap: wrap;
+}
+
+.images__no-image-text {
+  display: block;
+  font-size: 1.2rem;
+  color: #aaa;
+  text-align: center;
+  margin: 40vh auto 0 auto;
 }
 
 .image {
@@ -179,10 +187,10 @@ input[type='checkbox']:checked ~ aside {
   position: relative;
   flex-shrink: 0;
   flex-grow: 0;
-  flex-basis: calc(50% - 0.5rem);
-  padding-top: calc(50% - 0.5rem);
+  flex-basis: calc(50% - 0.0625rem);
+  padding-top: calc(50% - 0.0625rem);
   height: 0px;
-  transition: all 0.25s;
+  transition: all 0.35s ease-in;
   box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   background-image: radial-gradient(circle 20px, white 99%, transparent 0),
     radial-gradient(circle 20px, white 99%, transparent 0),
@@ -191,10 +199,16 @@ input[type='checkbox']:checked ~ aside {
   background-size: 100px 100px, 100px 100px, 100px 100px, 100% 100%;
   background-position: 20% 50%, 50% 50%, 80% 50%, 0 0;
   background-repeat: no-repeat;
+  opacity: 0.5;
+  transform: scale(1) translateY(10px);
+}
+.image--loaded {
+  opacity: 1;
+  transform: scale(1) translateY(0);
 }
 
 .image:hover {
-  transform: scale(1.05);
+  transform: scale(1.01);
   opacity: 0.7;
 }
 
@@ -208,10 +222,10 @@ input[type='checkbox']:checked ~ aside {
   justify-content: center;
 
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   height: 100%;
   width: 100%;
-  content: 'Open';
+  content: 'View';
   cursor: zoom-in;
   transition: all 0.25s;
   opacity: 0;
@@ -268,12 +282,12 @@ input[type='checkbox']:checked ~ aside {
 
 @media all and (min-width: 800px) {
   .images {
-    gap: 1rem;
+    gap: 0.25rem;
   }
 
   .image {
-    flex-basis: calc(33.33% - 0.67rem);
-    padding-top: calc(33.33% - 0.67rem);
+    flex-basis: calc(33.333% - 0.166rem);
+    padding-top: calc(33.333% - 0.166rem);
   }
 
   .btn-upload {

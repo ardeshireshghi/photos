@@ -1,10 +1,9 @@
 (() => {
-  function renderImages(imageUrls) {
-    const imagesContainer = document.querySelector('.js-images');
+  function doRenderImages(imagesContainer, imageUrls) {
     imageUrls.forEach((url) => {
       const imageLink = document.createElement('a');
       imageLink.href = url;
-      imageLink.className = 'image';
+      imageLink.className = 'js-image image';
 
       if (imagesContainer.children.length > 0) {
         imagesContainer.insertBefore(imageLink, imagesContainer.firstChild);
@@ -12,7 +11,7 @@
         imagesContainer.appendChild(imageLink);
       }
 
-      imageLink.style.backgroundImage = `url(${url})`;
+      imageLink.setAttribute('data-url', url);
       imageLink.style.backgroundPosition = 'center';
       imageLink.style.backgroundSize = 'cover';
     });
@@ -30,12 +29,51 @@
       concurrency: 10
     });
 
+    const imageIntersectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((item) => {
+          if (item.isIntersecting) {
+            const imageEl = item.target;
+            const imageUrl = item.target.getAttribute('data-url');
+
+            if (imageUrl) {
+              imageEl.style.backgroundImage = `url(${imageUrl})`;
+              imageEl.style.transitionDelay = `${Math.random() * 300 + 50}ms`;
+
+              setTimeout(() => {
+                imageEl.classList.add('image--loaded');
+              }, 100);
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.2
+      }
+    );
+
+    const renderImages = (urls) => {
+      const imagesContainer = document.querySelector('.js-images');
+      const noImageText = imagesContainer.querySelector(
+        '.js-images__no-image-text'
+      );
+      noImageText && noImageText.remove();
+      doRenderImages(imagesContainer, urls);
+      lightGallery(imagesContainer);
+
+      // start observing images
+      imagesContainer.querySelectorAll('.js-image').forEach((imageEl) => {
+        imageIntersectionObserver.observe(imageEl);
+      });
+    };
+
     const uploader = new ImageUploader({
       containerEl: uploaderContainerEl,
       async onFilesSelected(files) {
         uploader.setUploadStatus({ isUploading: true });
         let filesToUpload = Array.from(files);
         let filesUploaded = 0;
+        let imageUrls = [];
         const filesToUploadCount = filesToUpload.length;
 
         const doUploadImages = () => {
@@ -46,14 +84,17 @@
 
             uploadTaskRunner.enqueue(
               filesToUpload.map(async (file) => {
-                const url = await getUploadSignedRequest(file);
-                renderImages([url]);
-
-                filesUploaded += 1;
-                filesToUpload.splice(filesToUpload.indexOf(file), 1);
-                uploader.setUploadStatus({
-                  text: `Uploaded ${filesUploaded} from ${filesToUploadCount} images`
-                });
+                try {
+                  const url = await getUploadSignedRequest(file);
+                  imageUrls.push(url);
+                  filesUploaded += 1;
+                  filesToUpload.splice(filesToUpload.indexOf(file), 1);
+                  uploader.setUploadStatus({
+                    text: `Uploaded ${filesUploaded} from ${filesToUploadCount} images`
+                  });
+                } catch (err) {
+                  console.error('There was an error uploading image', err);
+                }
               })
             );
           });
@@ -64,15 +105,24 @@
             await handleUpload();
           };
 
+          // This is to resume uploading in case of losing connection
           window.addEventListener('online', handleGoesBackToOnline, {
             once: true
           });
 
           await doUploadImages();
-          lightGallery(imagesContainer);
+
+          // Render images and set the image gallery
+          if (imageUrls.length > 0) {
+            renderImages(imageUrls);
+
+            // Empty url cache
+            imageUrls = [];
+          }
 
           window.removeEventListener('online', handleGoesBackToOnline);
 
+          // Reset uploader state and hide the sidebar
           uploader.setUploadStatus({ isUploading: false });
           sidebar.hide();
         };
@@ -81,14 +131,18 @@
       }
     });
 
+    // Render uploader and set sidebar
     sidebar.renderContent(uploaderContainerEl);
     uploader.render();
 
+    const urls = await fetchImages();
+
+    if (urls.length > 0) {
+      renderImages(urls);
+    }
+
     // Show uploader when button is clicked
     document.querySelector('.js-btn-upload').onclick = () => sidebar.show();
-
-    renderImages(await fetchImages());
-    lightGallery(imagesContainer);
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
