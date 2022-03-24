@@ -43,6 +43,9 @@ Currently, the deployment assumes below:
 - HEROKU_APP_NAME
 - AWS_ACCESS_KEY_ID (access S3 bucket)
 - AWS_SECRET_ACCESS_KEY (access S3 bucket)
+- ADMIN_USERNAME (basic auth user to access the app)
+- ADMIN_PASSWORD (basic auth password to access the app)
+- S3_BUCKET (name of the S3 bucket which stores photos)
 
 ## Infrastructure
 
