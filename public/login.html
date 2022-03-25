@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Login to Image Gallery and uploader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
+    <link href="/styles/app.css" rel="stylesheet" type="text/css" />
+    <script>
+      if (localStorage.getItem('accessToken')) {
+        location.href = '/';
+      }
+    </script>
+  </head>
+  <body>
+    <header class="master-header">
+      <a href="/" class="logo">MyPhotos</a>
+    </header>
+    <div class="wrapper">
+      <header>
+        <h1>Login</h1>
+      </header>
+        <form id="login-form" name="login" action="/api/v1/login" method="POST">
+          <label for="username">
+            Username
+            <input type="text" id="username" name="username" placeholder="e.g. admin"/>
+          </label>
+          <label for="password">
+            Password
+            <input type="password" id="password" name="password" />
+          </label>
+          <button class="btn" type="submit">Login</button>
+        </form>
+
+        <script src="js/services/auth.js"></script>
+        <script>
+          (() => {
+            const loginForm = document.forms.login;
+
+            loginForm.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              const payload = {
+                username: loginForm.elements.username.value,
+                password: loginForm.elements.password.value,
+              };
+
+              if (payload.username && payload.password) {
+                try {
+                  const { token } = await loginUser(payload);
+
+                  if (token) {
+                    // Set token and redirect
+                    localStorage.setItem('accessToken', token);
+                    location.href = '/';
+                  }
+                } catch(err) {
+                  alert('Invalid username or password');
+                }
+
+
+              } else {
+                alert('Please set username and/or password');
+              }
+            })
+          })();
+        </script>
+
+  </body>
+</html>

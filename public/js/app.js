@@ -141,6 +141,12 @@
         renderImages(urls);
       }
     } catch (err) {
+      // This means that the user is not authenticated
+      if (err.message === 'ParseImageError') {
+        location.href = '/login';
+        return;
+      }
+
       const noImageText = imagesContainer.querySelector(
         '.js-images__no-image-text'
       );
@@ -153,6 +159,12 @@
 
     // Show uploader when button is clicked
     document.querySelector('.js-btn-upload').onclick = () => sidebar.show();
+
+    document.querySelector('.js-logout').onclick = (e) => {
+      e.preventDefault();
+      localStorage.removeItem('accessToken');
+      location.href = '/login';
+    };
   }
 
   document.addEventListener('DOMContentLoaded', async () => {

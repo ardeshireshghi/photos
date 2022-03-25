@@ -161,16 +161,16 @@ const ImageUploader = (() => {
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          outline: 2px dashed #92b0b3;
+          outline: 2px dashed #8d97ce;
           outline-offset: -10px;
-          background-color: #e9eeef;
+          background-color: rgba(81, 102, 216, 0.12);
           transition: outline-offset .15s ease-in-out, background-color .15s linear;
           cursor: pointer;
         }
 
         .image-uploader--dragover {
           outline-offset: -15px;
-          outline-color: #c8dadf;
+          outline-color: #cbc8df;
           background-color: #fff;
         }
 

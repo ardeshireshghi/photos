@@ -22,6 +22,8 @@ async function getUploadSignedRequest(file) {
       'GET',
       `/api/v1/sign-s3?file-name=${file.name}&file-type=${file.type}`
     );
+    const authToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', `Basic ${authToken}`);
     xhr.onreadystatechange = async () => {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
