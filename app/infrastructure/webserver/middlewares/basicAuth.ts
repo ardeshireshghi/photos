@@ -18,24 +18,24 @@ export function basicAuth() {
   const basicAuthHandler = (req, res, next) => {
     const authorization = req.headers.authorization;
 
-    if (!process.env.ADMIN_USERNAME) {
+    // Exclude login page and login api
+    if (!process.env.ADMIN_USERNAME || req.url.includes('login')) {
       next();
       return;
     }
 
     if (!authorization || !authorization.startsWith('Basic')) {
-      showAuthPrompt(res);
+      res.redirect('/login');
       return;
     }
 
     const [username, password] = credentialsFromAuthHeader(authorization);
-
     const isAdminUser =
       username === process.env.ADMIN_USERNAME &&
       password === process.env.ADMIN_PASSWORD;
 
     if (!isAdminUser) {
-      showAuthPrompt(res);
+      res.redirect('/login');
       return;
     }
 
