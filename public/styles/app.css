@@ -340,6 +340,7 @@ input[type='checkbox']:checked ~ aside {
 .master-header {
   height: 80px;
   position: sticky;
+  z-index: 10;
   top: 0;
   background-color: #fefefe;
   box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
