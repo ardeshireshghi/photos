@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width" />
     <title>Image Gallery and uploader</title>
     <link href="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/src/css/lightgallery.css" rel="stylesheet" type="text/css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
     <link href="/styles/load-awesome.css" rel="stylesheet" type="text/css" />
     <link href="/styles/app.css" rel="stylesheet" type="text/css" />
   </head>
@@ -18,10 +21,15 @@
         <div></div>
       </div>
     </div>
-
+    <header class="master-header">
+      <a href="/" class="logo">MyPhotos</a>
+      <nav>
+        <button class="js-logout btn">Logout</button>
+      </nav>
+    </header>
     <div class="wrapper">
       <header>
-        <h1>Image Gallery and uploader</h1>
+        <h1>Gallery</h1>
       </header>
         <div id="uploader" class="uploader"></div>
         <div class="js-images images"><span class="js-images__no-image-text images__no-image-text">📷 You have no images in the Gallery. Start uploading</span></div>

@@ -297,3 +297,29 @@ input[type='checkbox']:checked ~ aside {
     line-height: 60px;
   }
 }
+
+.master-header {
+  height: 80px;
+  position: sticky;
+  top: 0;
+  background-color: #fefefe;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+.master-header nav {
+  margin-left: auto;
+}
+
+.logo {
+  display: block;
+  text-decoration: none;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 500;
+  font-size: 2.2rem;
+  color: #7ec481;
+}
