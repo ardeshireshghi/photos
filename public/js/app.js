@@ -38,7 +38,7 @@
 
             if (imageUrl) {
               imageEl.style.backgroundImage = `url(${imageUrl})`;
-              imageEl.style.transitionDelay = `${Math.random() * 300 + 50}ms`;
+              imageEl.style.transitionDelay = `${Math.random() * 100 + 50}ms`;
 
               setTimeout(() => {
                 imageEl.classList.add('image--loaded');
@@ -165,6 +165,21 @@
       localStorage.removeItem('accessToken');
       location.href = '/login';
     };
+
+    // Grid view change
+    let currentActiveGridBtn;
+    document.querySelectorAll('[data-grid-size]').forEach((btn) => {
+      btn.onclick = (e) => {
+        if (currentActiveGridBtn) {
+          currentActiveGridBtn.classList.remove('toolbar__btn--active');
+        }
+        const gridSize = Number(e.currentTarget.getAttribute('data-grid-size'));
+        imagesContainer.style.setProperty('--grid-size', gridSize);
+
+        currentActiveGridBtn = e.currentTarget;
+        currentActiveGridBtn.classList.add('toolbar__btn--active');
+      };
+    });
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
